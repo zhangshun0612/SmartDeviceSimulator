@@ -7,11 +7,19 @@ public class SmartDeviceBaseMessage {
     @SerializedName("id")
     private String deviceId;
 
-    @SerializedName("ts")
-    private long timestamp;
-
-    @SerializedName("tp")
+    @SerializedName("mtp")
     private String msgType;
+
+    @SerializedName("ch")
+    private String channelType;
+
+    public String getChannelType() {
+        return channelType;
+    }
+
+    public void setChannelType(String channelType) {
+        this.channelType = channelType;
+    }
 
     public String getDeviceId() {
         return deviceId;
@@ -19,14 +27,6 @@ public class SmartDeviceBaseMessage {
 
     public void setDeviceId(String deviceId) {
         this.deviceId = deviceId;
-    }
-
-    public long getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
     }
 
     public String getMsgType() {

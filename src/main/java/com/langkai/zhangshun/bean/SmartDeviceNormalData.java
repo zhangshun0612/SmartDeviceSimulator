@@ -4,93 +4,38 @@ import com.google.gson.annotations.SerializedName;
 
 public class SmartDeviceNormalData {
 
-    @SerializedName("ph")
-    private String phase;
+    @SerializedName("cur_rt")
+    private SmartDeviceMetaData<Double> currentRealTimeValue;
 
-    @SerializedName("rt")
-    private double realtimeValue;
+    @SerializedName("cur_avg")
+    private SmartDeviceMetaData<Double> currentAvgValue;
 
-    @SerializedName("avg")
-    private double avgValue;
+    @SerializedName("cur_max")
+    private SmartDeviceMetaData<Double> currentmMaxValue;
 
-    @SerializedName("max")
-    private double maxValue;
+    @SerializedName("cur_min")
+    private SmartDeviceMetaData<Double> currentMinValue;
 
-    @SerializedName("min")
-    private double minValue;
+    @SerializedName("cur_elr_rt")
+    private SmartDeviceMetaData<Double> currentChargeRatio; //环流与电缆负荷比实时值
 
-    @SerializedName("cr")
-    private Double changeRate;
+    @SerializedName("cur_mmr_rt")
+    private SmartDeviceMetaData<Double> currentMaxMinRatio; //环流最大值与最小值实时值
 
-    @SerializedName("tmp")
-    private double temperature;
+    @SerializedName("temp_rt")
+    private SmartDeviceMetaData<Double> temperatureRealtimeValue; //温度实时值
 
-    @SerializedName("vb")
-    private boolean isVibration;
+    @SerializedName("temp_avg")
+    private SmartDeviceMetaData<Double> temperatureAvgValue; //温度平均值
 
-    public String getPhase() {
-        return phase;
-    }
+    @SerializedName("temp_max")
+    private SmartDeviceMetaData<Double> temperatureMaxValue; //温度最大值
 
-    public void setPhase(String phase) {
-        this.phase = phase;
-    }
+    @SerializedName("temp_min")
+    private SmartDeviceMetaData<Double> temperatureMinValue; //温度最小值
 
-    public double getRealtimeValue() {
-        return realtimeValue;
-    }
-
-    public void setRealtimeValue(double realtimeValue) {
-        this.realtimeValue = realtimeValue;
-    }
-
-    public double getAvgValue() {
-        return avgValue;
-    }
-
-    public void setAvgValue(double avgValue) {
-        this.avgValue = avgValue;
-    }
-
-    public double getMaxValue() {
-        return maxValue;
-    }
-
-    public void setMaxValue(double maxValue) {
-        this.maxValue = maxValue;
-    }
-
-    public double getMinValue() {
-        return minValue;
-    }
-
-    public void setMinValue(double minValue) {
-        this.minValue = minValue;
-    }
-
-    public Double getChangeRate() {
-        return changeRate;
-    }
-
-    public void setChangeRate(Double changeRate) {
-        this.changeRate = changeRate;
-    }
-
-    public double getTemperature() {
-        return temperature;
-    }
-
-    public void setTemperature(double temperature) {
-        this.temperature = temperature;
-    }
-
-    public boolean isVibration() {
-        return isVibration;
-    }
-
-    public void setVibration(boolean vibration) {
-        isVibration = vibration;
-    }
+    @SerializedName("vib")
+    private SmartDeviceMetaData<Integer> isVibration; //振动状态
 
 
 }

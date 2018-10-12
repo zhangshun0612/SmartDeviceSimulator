@@ -3,6 +3,7 @@ package com.langkai.zhangshun;
 import com.google.gson.Gson;
 import com.langkai.zhangshun.bean.SmartDeviceBaseMessage;
 import com.langkai.zhangshun.bean.SmartDeviceMessage;
+import com.langkai.zhangshun.bean.SmartDeviceMetaData;
 import com.langkai.zhangshun.bean.SmartDeviceNormalData;
 
 import java.lang.reflect.Type;
@@ -11,30 +12,32 @@ import java.util.Random;
 public class Main {
     public static void main(String[] args){
         System.out.println("Smart Device Simulator");
+
         Gson gson = new Gson();
+/*
+        SmartDeviceMetaData<Double> realtimeVal = new SmartDeviceMetaData<Double>(23.33, System.currentTimeMillis());
+        SmartDeviceMetaData<Integer> vibVal = new SmartDeviceMetaData<Integer>(1, System.currentTimeMillis());
 
-        Random rd = new Random();
-
-        SmartDeviceNormalData data = new SmartDeviceNormalData();
-        data.setPhase("M");
-        data.setRealtimeValue(rd.nextDouble() * 10);
-        data.setAvgValue(rd.nextDouble() * 10);
-        data.setMaxValue(rd.nextDouble() * 10);
-        data.setMinValue(rd.nextDouble() * 10);
-        data.setChangeRate(rd.nextDouble());
-        data.setTemperature(rd.nextDouble() * 30);
+        SmartDeviceNormalData nmData = new SmartDeviceNormalData();
+        nmData.setRealTimeValue(realtimeVal);
+        nmData.setIsVibration(vibVal);
 
         SmartDeviceMessage<SmartDeviceNormalData> msg = new SmartDeviceMessage<SmartDeviceNormalData>();
-        msg.setDeviceId("12345678ABCDEF");
-        msg.setTimestamp(System.currentTimeMillis());
+        msg.setData(nmData);
+        msg.setDeviceId("123456ABC");
         msg.setMsgType("normal");
-        msg.setData(data);
-
+        msg.setChannelType("A");
 
         String jsonStr = gson.toJson(msg);
+
         System.out.println(jsonStr);
 
+        SmartDeviceMessage<SmartDeviceNormalData> rcvMsg =  SmartDeviceMessage.fromJson(jsonStr, SmartDeviceNormalData.class);
 
+        System.out.println(rcvMsg.getData().getRealTimeValue().getValue());
+        System.out.println(rcvMsg.getData().getIsVibration().getValue());
+        */
+/*
         String jsonStr1 = "{\n" +
                 "\t\"msg\": {\n" +
                 "\t\t\"ph\": \"M\",\n" +
@@ -59,7 +62,7 @@ public class Main {
         }else{
             System.out.println("No data");
         }
-
+*/
 
     }
 }
