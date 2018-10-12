@@ -1,68 +1,117 @@
 package com.langkai.zhangshun;
 
 import com.google.gson.Gson;
-import com.langkai.zhangshun.bean.SmartDeviceBaseMessage;
-import com.langkai.zhangshun.bean.SmartDeviceMessage;
-import com.langkai.zhangshun.bean.SmartDeviceMetaData;
-import com.langkai.zhangshun.bean.SmartDeviceNormalData;
+import com.langkai.zhangshun.bean.*;
+import com.langkai.zhangshun.service.AliIotMqttService;
+import org.eclipse.paho.client.mqttv3.MqttException;
 
-import java.lang.reflect.Type;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Random;
 
 public class Main {
+
+    static String deviceName = "lk_device_IM2211C_0001";
+    static String deviceSecret = "ieDuYZhc70BHONuWYGKAXuv1V3Mueq0Q";
+
+    static String productKey = "a1E6VCCsule";
+    static Random random = new Random();
+
+    static AliIotMqttService iotService;
     public static void main(String[] args){
         System.out.println("Smart Device Simulator");
 
-        Gson gson = new Gson();
-/*
-        SmartDeviceMetaData<Double> realtimeVal = new SmartDeviceMetaData<Double>(23.33, System.currentTimeMillis());
-        SmartDeviceMetaData<Integer> vibVal = new SmartDeviceMetaData<Integer>(1, System.currentTimeMillis());
+        AliIotDevice device = new AliIotDevice();
+        device.setName(deviceName);
+        device.setSecret(deviceSecret);
 
+        iotService = new AliIotMqttService();
+        try {
+            iotService.mqttConnect("IM2211C_0001", productKey, device);
+        } catch (MqttException e) {
+            e.printStackTrace();
+            System.out.println("Connect to IotHub Failed");
+            return;
+        }
+
+        System.out.println("连接成功");
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+        String cmdLine = "";
+
+        while (true)
+        {
+            try {
+                cmdLine = br.readLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if(cmdLine.equals("send")){
+                String msg = generateNormalDataJson();
+                System.out.println(msg);
+                try {
+                    iotService.mqttPublish(msg);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.out.println("Publish Failed");
+                }
+
+            }else if(cmdLine.equals("exit")){
+                return;
+            }
+        }
+    }
+
+    static String generateNormalDataJson()
+    {
         SmartDeviceNormalData nmData = new SmartDeviceNormalData();
-        nmData.setRealTimeValue(realtimeVal);
-        nmData.setIsVibration(vibVal);
+        nmData.setCurrentRealTimeValue(new SmartDeviceMetaData<Double>(generateRandomValue(100), System.currentTimeMillis()));
+        nmData.setCurrentAvgValue(new SmartDeviceMetaData<Double>(generateRandomValue(100), System.currentTimeMillis()));
+        nmData.setCurrentAvgValue(new SmartDeviceMetaData<Double>(generateRandomValue(100), System.currentTimeMillis()));
+        nmData.setCurrentMaxValue(new SmartDeviceMetaData<Double>(generateRandomValue(100), System.currentTimeMillis()));
+        nmData.setCurrentMinValue(new SmartDeviceMetaData<Double>(generateRandomValue(100), System.currentTimeMillis()));
+        nmData.setCurrentChargeRatio(new SmartDeviceMetaData<Double>(generateRandomValue(10), System.currentTimeMillis()));
+        nmData.setCurrentMaxMinRatio(new SmartDeviceMetaData<Double>(generateRandomValue(5), System.currentTimeMillis()));
+        nmData.setTemperatureRealtimeValue(new SmartDeviceMetaData<Double>(generateRandomValue(100), System.currentTimeMillis()));
+        nmData.setTemperatureAvgValue(new SmartDeviceMetaData<Double>(generateRandomValue(100), System.currentTimeMillis()));
+        nmData.setTemperatureMaxValue(new SmartDeviceMetaData<Double>(generateRandomValue(100), System.currentTimeMillis()));
+        nmData.setTemperatureMinValue(new SmartDeviceMetaData<Double>(generateRandomValue(100), System.currentTimeMillis()));
+        nmData.setIsVibration(new SmartDeviceMetaData<Integer>(1, System.currentTimeMillis()));
 
         SmartDeviceMessage<SmartDeviceNormalData> msg = new SmartDeviceMessage<SmartDeviceNormalData>();
         msg.setData(nmData);
         msg.setDeviceId("123456ABC");
         msg.setMsgType("normal");
-        msg.setChannelType("A");
 
-        String jsonStr = gson.toJson(msg);
-
-        System.out.println(jsonStr);
-
-        SmartDeviceMessage<SmartDeviceNormalData> rcvMsg =  SmartDeviceMessage.fromJson(jsonStr, SmartDeviceNormalData.class);
-
-        System.out.println(rcvMsg.getData().getRealTimeValue().getValue());
-        System.out.println(rcvMsg.getData().getIsVibration().getValue());
-        */
-/*
-        String jsonStr1 = "{\n" +
-                "\t\"msg\": {\n" +
-                "\t\t\"ph\": \"M\",\n" +
-                "\t\t\"rt\": 5.616882385740658,\n" +
-                "\t\t\"avg\": 4.921398098500255,\n" +
-                "\t\t\"max\": 6.475501857995816,\n" +
-                "\t\t\"min\": 7.012946761940655,\n" +
-                "\t\t\"tmp\": 20.745688727010588,\n" +
-                "\t\t\"vb\": false\n" +
-                "\t},\n" +
-                "\t\"id\": \"12345678ABCDEF\",\n" +
-                "\t\"ts\": 1539160567336,\n" +
-                "\t\"tp\": \"normal\"\n" +
-                "}";
-
-
-        SmartDeviceMessage<SmartDeviceNormalData> rcvmsg = SmartDeviceMessage.fromJson(jsonStr1, SmartDeviceNormalData.class);
-
-        if(rcvmsg.getData() != null){
-            System.out.println(rcvmsg.getData().getPhase());
-            System.out.println(rcvmsg.getData().getChangeRate() == null);
-        }else{
-            System.out.println("No data");
+        switch (random.nextInt() % 5)
+        {
+            case 0:
+                msg.setChannelType("A");
+                break;
+            case 1:
+                msg.setChannelType("B");
+                break;
+            case 2:
+                msg.setChannelType("C");
+                break;
+            case 3:
+                msg.setChannelType("N");
+                break;
+            case 4:
+                msg.setChannelType("Cable");
+                break;
+             default:
+                 msg.setChannelType("Cable");
         }
-*/
 
+        Gson gson = new Gson();
+        return gson.toJson(msg);
+    }
+
+    static double generateRandomValue(double multiVal)
+    {
+        return random.nextDouble() * multiVal;
     }
 }
