@@ -30,9 +30,9 @@ public class AliIotMqttService {
     };
 
     public void mqttConnect(String clientId, String productKey, AliIotDevice deviceInfo) throws MqttException {
-        String brokeAddress = "ssl://" + productKey + "." + aliIotAddress + ":1883";
+        String brokeAddress = "tcp://" + productKey + "." + aliIotAddress + ":1883";
 
-        String mqttClientId = clientId + "|securemode=2,signmethod=hmacsha1|";
+        String mqttClientId = clientId + "|securemode=3,signmethod=hmacsha1|";
         String mqttUsername = deviceInfo.getName() + "&" + productKey;
 
         pubTopic = "/" + productKey + "/" + deviceInfo.getName() + "/user/update";

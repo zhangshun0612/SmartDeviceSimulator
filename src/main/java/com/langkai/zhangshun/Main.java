@@ -12,8 +12,9 @@ import java.util.Random;
 
 public class Main {
 
-    static String deviceName = "lk_device_IM2211C_0001";
-    static String deviceSecret = "ieDuYZhc70BHONuWYGKAXuv1V3Mueq0Q";
+
+    static String deviceName = "lk_device_IM2211C_0002";
+    static String deviceSecret = "IcGjhDLmm7hnpHaABtxIa5IU82xJu2Ab";
 
     static String productKey = "a1E6VCCsule";
     static Random random = new Random();
@@ -22,13 +23,14 @@ public class Main {
     public static void main(String[] args){
         System.out.println("Smart Device Simulator");
 
+        /*
         AliIotDevice device = new AliIotDevice();
         device.setName(deviceName);
         device.setSecret(deviceSecret);
 
         iotService = new AliIotMqttService();
         try {
-            iotService.mqttConnect("IM2211C_0001", productKey, device);
+            iotService.mqttConnect("IM2211C_0002", productKey, device);
         } catch (MqttException e) {
             e.printStackTrace();
             System.out.println("Connect to IotHub Failed");
@@ -40,78 +42,48 @@ public class Main {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
         String cmdLine = "";
+        */
 
-        while (true)
-        {
-            try {
-                cmdLine = br.readLine();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            if(cmdLine.equals("send")){
-                String msg = generateNormalDataJson();
-                System.out.println(msg);
-                try {
-                    iotService.mqttPublish(msg);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    System.out.println("Publish Failed");
-                }
+        SmartDeviceMessage<SmartDeviceRealTimeData> msg = new SmartDeviceMessage<SmartDeviceRealTimeData>();
 
-            }else if(cmdLine.equals("exit")){
-                return;
-            }
-        }
-    }
+        SmartDeviceRealTimeData rt = new SmartDeviceRealTimeData();
+        rt.setRealTimeValue(new SmartDeviceMetaData<Double>(generateRandomValue(10), System.currentTimeMillis()));
+        rt.setElectricChargeRatio(new SmartDeviceMetaData<Double>(generateRandomValue(1), System.currentTimeMillis()));
 
-    static String generateNormalDataJson()
-    {
-        SmartDeviceNormalData nmData = new SmartDeviceNormalData();
-        nmData.setCurrentRealTimeValue(new SmartDeviceMetaData<Double>(generateRandomValue(100), System.currentTimeMillis()));
-        nmData.setCurrentAvgValue(new SmartDeviceMetaData<Double>(generateRandomValue(100), System.currentTimeMillis()));
-        nmData.setCurrentAvgValue(new SmartDeviceMetaData<Double>(generateRandomValue(100), System.currentTimeMillis()));
-        nmData.setCurrentMaxValue(new SmartDeviceMetaData<Double>(generateRandomValue(100), System.currentTimeMillis()));
-        nmData.setCurrentMinValue(new SmartDeviceMetaData<Double>(generateRandomValue(100), System.currentTimeMillis()));
-        nmData.setCurrentChargeRatio(new SmartDeviceMetaData<Double>(generateRandomValue(10), System.currentTimeMillis()));
-        nmData.setCurrentMaxMinRatio(new SmartDeviceMetaData<Double>(generateRandomValue(5), System.currentTimeMillis()));
-        nmData.setTemperatureRealtimeValue(new SmartDeviceMetaData<Double>(generateRandomValue(100), System.currentTimeMillis()));
-        nmData.setTemperatureAvgValue(new SmartDeviceMetaData<Double>(generateRandomValue(100), System.currentTimeMillis()));
-        nmData.setTemperatureMaxValue(new SmartDeviceMetaData<Double>(generateRandomValue(100), System.currentTimeMillis()));
-        nmData.setTemperatureMinValue(new SmartDeviceMetaData<Double>(generateRandomValue(100), System.currentTimeMillis()));
-        nmData.setIsVibration(new SmartDeviceMetaData<Integer>(1, System.currentTimeMillis()));
-
-        SmartDeviceMessage<SmartDeviceNormalData> msg = new SmartDeviceMessage<SmartDeviceNormalData>();
-        msg.setData(nmData);
-        msg.setDeviceId("123456ABC");
+        msg.setChannelType("A_CABLE");
         msg.setMsgType("normal");
-
-        switch (random.nextInt() % 5)
-        {
-            case 0:
-                msg.setChannelType("A");
-                break;
-            case 1:
-                msg.setChannelType("B");
-                break;
-            case 2:
-                msg.setChannelType("C");
-                break;
-            case 3:
-                msg.setChannelType("N");
-                break;
-            case 4:
-                msg.setChannelType("Cable");
-                break;
-             default:
-                 msg.setChannelType("Cable");
-        }
+        msg.setDeviceId("12345678ABCD");
+        msg.setData(rt);
 
         Gson gson = new Gson();
-        return gson.toJson(msg);
+        String jsonStr = gson.toJson(msg);
+
+        System.out.println(jsonStr);
+
     }
+
 
     static double generateRandomValue(double multiVal)
     {
         return random.nextDouble() * multiVal;
+    }
+
+    static String generateRealTimeMessage()
+    {
+        SmartDeviceMessage<SmartDeviceRealTimeData> msg = new SmartDeviceMessage<SmartDeviceRealTimeData>();
+
+        SmartDeviceRealTimeData rt = new SmartDeviceRealTimeData();
+        rt.setRealTimeValue(new SmartDeviceMetaData<Double>(generateRandomValue(10), System.currentTimeMillis()));
+        rt.setElectricChargeRatio(new SmartDeviceMetaData<Double>(generateRandomValue(1), System.currentTimeMillis()));
+
+        msg.setChannelType("A_CABLE");
+        msg.setMsgType("normal");
+        msg.setDeviceId("12345678ABCD");
+        msg.setData(rt);
+
+        Gson gson = new Gson();
+        String jsonStr = gson.toJson(msg);
+
+        return jsonStr;
     }
 }
