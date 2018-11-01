@@ -8,6 +8,7 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.Random;
 
 public class Main {
@@ -22,8 +23,6 @@ public class Main {
     static AliIotMqttService iotService;
     public static void main(String[] args){
         System.out.println("Smart Device Simulator");
-
-        /*
         AliIotDevice device = new AliIotDevice();
         device.setName(deviceName);
         device.setSecret(deviceSecret);
@@ -37,28 +36,34 @@ public class Main {
             return;
         }
 
+
         System.out.println("连接成功");
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
         String cmdLine = "";
-        */
+        while(true){
+            try {
+                cmdLine = br.readLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+                break;
+            }
 
-        SmartDeviceMessage<SmartDeviceRealTimeData> msg = new SmartDeviceMessage<SmartDeviceRealTimeData>();
+            if(cmdLine.equals("quit")){
+                break;
+            }else if(cmdLine.equals("send")){
+                String msg = generateNormalMessage();
 
-        SmartDeviceRealTimeData rt = new SmartDeviceRealTimeData();
-        rt.setRealTimeValue(new SmartDeviceMetaData<Double>(generateRandomValue(10), System.currentTimeMillis()));
-        rt.setElectricChargeRatio(new SmartDeviceMetaData<Double>(generateRandomValue(1), System.currentTimeMillis()));
-
-        msg.setChannelType("A_CABLE");
-        msg.setMsgType("normal");
-        msg.setDeviceId("12345678ABCD");
-        msg.setData(rt);
-
-        Gson gson = new Gson();
-        String jsonStr = gson.toJson(msg);
-
-        System.out.println(jsonStr);
+                try {
+                    iotService.mqttPublish(msg);
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                } catch (MqttException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
 
     }
 
@@ -68,22 +73,22 @@ public class Main {
         return random.nextDouble() * multiVal;
     }
 
-    static String generateRealTimeMessage()
+    static String generateNormalMessage()
     {
-        SmartDeviceMessage<SmartDeviceRealTimeData> msg = new SmartDeviceMessage<SmartDeviceRealTimeData>();
+        CableSensorMessage<CableSensorNormalData> msg = new CableSensorMessage<CableSensorNormalData>();
 
-        SmartDeviceRealTimeData rt = new SmartDeviceRealTimeData();
-        rt.setRealTimeValue(new SmartDeviceMetaData<Double>(generateRandomValue(10), System.currentTimeMillis()));
-        rt.setElectricChargeRatio(new SmartDeviceMetaData<Double>(generateRandomValue(1), System.currentTimeMillis()));
+        CableSensorNormalData rt = new CableSensorNormalData();
+        rt.setRealTimeValue(new CableSensorMetaData<Double>(generateRandomValue(10), System.currentTimeMillis()));
+        rt.setElectricChangeRate(new CableSensorMetaData<Double>(generateRandomValue(1), System.currentTimeMillis()));
 
-        msg.setChannelType("A_CABLE");
-        msg.setMsgType("normal");
-        msg.setDeviceId("12345678ABCD");
+        msg.setChannel(CableSensorMessage.CHANNEL_A_CABLE);
+        msg.setMsgType(CableSensorMessage.MSG_TYPE_NORMAL);
+        msg.setBindingDeviceId("IM2211C_0002");
+        msg.setSensorId("12345678ABCD");
         msg.setData(rt);
 
         Gson gson = new Gson();
         String jsonStr = gson.toJson(msg);
-
         return jsonStr;
     }
 }

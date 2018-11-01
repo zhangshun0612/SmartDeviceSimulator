@@ -3,6 +3,7 @@ package com.langkai.zhangshun.service;
 import com.langkai.zhangshun.bean.AliIotDevice;
 import com.langkai.zhangshun.utils.SignUtil;
 import org.eclipse.paho.client.mqttv3.*;
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
@@ -30,9 +31,9 @@ public class AliIotMqttService {
     };
 
     public void mqttConnect(String clientId, String productKey, AliIotDevice deviceInfo) throws MqttException {
-        String brokeAddress = "tcp://" + productKey + "." + aliIotAddress + ":1883";
+        String brokeAddress = "ssl://" + productKey + "." + aliIotAddress + ":1883";
 
-        String mqttClientId = clientId + "|securemode=3,signmethod=hmacsha1|";
+        String mqttClientId = clientId + "|securemode=2,signmethod=hmacsha1|";
         String mqttUsername = deviceInfo.getName() + "&" + productKey;
 
         pubTopic = "/" + productKey + "/" + deviceInfo.getName() + "/user/update";
@@ -45,7 +46,8 @@ public class AliIotMqttService {
         String mqttPassword = SignUtil.sign(params, deviceInfo.getSecret(), "hmacsha1");
         System.out.println("Mqtt Password : " + mqttPassword);
 
-        mqttClient = new MqttClient(brokeAddress, mqttClientId);
+        mqttClient = new MqttClient(brokeAddress, mqttClientId, new MemoryPersistence());
+
 
         MqttConnectOptions connOption = new MqttConnectOptions();
         connOption.setMqttVersion(4);

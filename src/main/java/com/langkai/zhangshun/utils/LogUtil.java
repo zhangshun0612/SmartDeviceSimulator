@@ -15,7 +15,7 @@ import java.util.Date;
 public class LogUtil {
     
     /** 是否打印日志 **/
-    public static boolean   showLog      = true;
+    public static boolean   showLog      = false;
 
     static SimpleDateFormat fm = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
 
