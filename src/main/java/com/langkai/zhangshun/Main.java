@@ -14,8 +14,8 @@ import java.util.Random;
 public class Main {
 
 
-    static String deviceName = "lk_device_IM2211C_0002";
-    static String deviceSecret = "IcGjhDLmm7hnpHaABtxIa5IU82xJu2Ab";
+    static String deviceName = "lk_device_IM2211C_0001";
+    static String deviceSecret = "ieDuYZhc70BHONuWYGKAXuv1V3Mueq0Q";
 
     static String productKey = "a1E6VCCsule";
     static Random random = new Random();
@@ -52,8 +52,17 @@ public class Main {
 
             if(cmdLine.equals("quit")){
                 break;
-            }else if(cmdLine.equals("send")){
-                String msg = generateNormalMessage();
+            }else if(cmdLine.startsWith("send")){
+                String chDef = CableSensorMessage.CHANNEL_A_CABLE;
+
+                String[] cmdArgs = cmdLine.split(" ");
+                if(cmdArgs.length == 2){
+                    chDef = cmdArgs[1];
+                }
+
+                String msg = generateNormalMessage(chDef);
+
+                System.out.println(msg);
 
                 try {
                     iotService.mqttPublish(msg);
@@ -73,7 +82,7 @@ public class Main {
         return random.nextDouble() * multiVal;
     }
 
-    static String generateNormalMessage()
+    static String generateNormalMessage(String channel)
     {
         CableSensorMessage<CableSensorNormalData> msg = new CableSensorMessage<CableSensorNormalData>();
 
@@ -81,14 +90,17 @@ public class Main {
         rt.setRealTimeValue(new CableSensorMetaData<Double>(generateRandomValue(10), System.currentTimeMillis()));
         rt.setElectricChangeRate(new CableSensorMetaData<Double>(generateRandomValue(1), System.currentTimeMillis()));
 
-        msg.setChannel(CableSensorMessage.CHANNEL_A_CABLE);
+        msg.setChannel(channel);
         msg.setMsgType(CableSensorMessage.MSG_TYPE_NORMAL);
-        msg.setBindingDeviceId("IM2211C_0002");
-        msg.setSensorId("12345678ABCD");
+        msg.setBindingDeviceId("IM2211C_0001");
+        msg.setSensorId("123456789ABCD");
         msg.setData(rt);
 
         Gson gson = new Gson();
         String jsonStr = gson.toJson(msg);
         return jsonStr;
     }
+
+
+
 }
