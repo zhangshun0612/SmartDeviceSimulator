@@ -9,6 +9,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class Main {
@@ -23,6 +25,19 @@ public class Main {
     static AliIotMqttService iotService;
     public static void main(String[] args){
         System.out.println("Smart Device Simulator");
+
+        List<String> channelsList = new ArrayList<String>();
+        channelsList.add(CableSensorMessage.CHANNEL_A_CABLE);
+        channelsList.add(CableSensorMessage.CHANNEL_B_CABLE);
+        channelsList.add(CableSensorMessage.CHANNEL_C_CABLE);
+        channelsList.add(CableSensorMessage.CHANNEL_A_EARTH);
+        channelsList.add(CableSensorMessage.CHANNEL_B_EARTH);
+        channelsList.add(CableSensorMessage.CHANNEL_C_EARTH);
+        channelsList.add(CableSensorMessage.CHANNEL_N_EARTH);
+        channelsList.add(CableSensorMessage.CHANNEL_A_TEMP);
+        channelsList.add(CableSensorMessage.CHANNEL_B_TEMP);
+        channelsList.add(CableSensorMessage.CHANNEL_C_TEMP);
+
         AliIotDevice device = new AliIotDevice();
         device.setName(deviceName);
         device.setSecret(deviceSecret);
@@ -35,7 +50,6 @@ public class Main {
             System.out.println("Connect to IotHub Failed");
             return;
         }
-
 
         System.out.println("连接成功");
 
@@ -71,6 +85,37 @@ public class Main {
                 } catch (MqttException e) {
                     e.printStackTrace();
                 }
+            }else if(cmdLine.startsWith("recycle")){
+                System.out.println("waiting..");
+
+                int recycleCnt = 0;
+                String[] cmdArgs = cmdLine.split(" ");
+                if(cmdArgs.length == 2){
+                    recycleCnt = Integer.parseInt(cmdArgs[1]);
+                }
+
+                for(int i = 0 ; i < recycleCnt; i++){
+                    System.out.println("recycle: " + (i + 1));
+                    for(String channelDef : channelsList){
+                        String msg =generateStatisticMessage(channelDef);
+
+                        try {
+                            iotService.mqttPublish(msg);
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        } catch (MqttException e) {
+                            e.printStackTrace();
+                        }
+
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+                System.out.println("ok..");
             }
         }
 
