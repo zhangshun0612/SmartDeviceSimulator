@@ -60,7 +60,7 @@ public class Main {
                     chDef = cmdArgs[1];
                 }
 
-                String msg = generateNormalMessage(chDef);
+                String msg = generateStatisticMessage(chDef);
 
                 System.out.println(msg);
 
@@ -88,8 +88,10 @@ public class Main {
 
         CableSensorNormalData rt = new CableSensorNormalData();
         rt.setRealTimeValue(new CableSensorMetaData<Double>(generateRandomValue(10), System.currentTimeMillis()));
-        rt.setElectricChangeRate(new CableSensorMetaData<Double>(generateRandomValue(1), System.currentTimeMillis()));
 
+        if(!channel.equals("A_TEMP") && !channel.equals("B_TEMP") && !channel.equals("C_TEMP")) {
+            rt.setElectricChangeRate(new CableSensorMetaData<Double>(generateRandomValue(1), System.currentTimeMillis()));
+        }
         msg.setChannel(channel);
         msg.setMsgType(CableSensorMessage.MSG_TYPE_NORMAL);
         msg.setBindingDeviceId("IM2211C_0001");
@@ -99,6 +101,33 @@ public class Main {
         Gson gson = new Gson();
         String jsonStr = gson.toJson(msg);
         return jsonStr;
+    }
+
+    static String generateStatisticMessage(String channel){
+
+        CableSensorMessage<CableSensorStatisticData> msg = new CableSensorMessage<CableSensorStatisticData>();
+
+        CableSensorStatisticData statis = new CableSensorStatisticData();
+
+        statis.setAvgValue(new CableSensorMetaData<Double>(generateRandomValue(10), System.currentTimeMillis()));
+        statis.setMaxValue(new CableSensorMetaData<Double>(generateRandomValue(10), System.currentTimeMillis()));
+        statis.setMinValue(new CableSensorMetaData<Double>(generateRandomValue(10), System.currentTimeMillis()));
+
+        if(!channel.equals("A_TEMP") && !channel.equals("B_TEMP") && !channel.equals("C_TEMP")) {
+            statis.setMaxMinRatio(new CableSensorMetaData<Double>(generateRandomValue(1), System.currentTimeMillis()));
+        }
+
+
+        msg.setChannel(channel);
+        msg.setMsgType(CableSensorMessage.MSG_TYPE_STATISTIC);
+        msg.setBindingDeviceId("IM2211C_0001");
+        msg.setSensorId("123456789ABCD");
+        msg.setData(statis);
+
+        Gson gson = new Gson();
+        String jsonStr = gson.toJson(msg);
+        return jsonStr;
+
     }
 
 
