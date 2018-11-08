@@ -116,6 +116,20 @@ public class Main {
                 }
 
                 System.out.println("ok..");
+            }else if(cmdLine.startsWith("alarm")){
+                String[] cmdArgs = cmdLine.split(" ");
+
+                String chDef = CableSensorMessage.CHANNEL_A_CABLE;
+                String alarmType = CableSensorAlarmData.ALARM_THREHOLD;
+
+                if(cmdArgs.length == 3){
+                    chDef = cmdArgs[1];
+                    alarmType = cmdArgs[2];
+                }
+
+                String msg = generateAlarmMessage(chDef, alarmType);
+
+                System.out.println(msg);
             }
         }
 
@@ -175,6 +189,24 @@ public class Main {
 
     }
 
+    static String generateAlarmMessage(String channel, String alarmType){
+        CableSensorMessage<CableSensorAlarmData> msg = new CableSensorMessage<CableSensorAlarmData>();
+
+        CableSensorAlarmData alarm = new CableSensorAlarmData();
+        alarm.setValue(generateRandomValue(10));
+        alarm.setTimestamp(System.currentTimeMillis());
+        alarm.setAlarmType(alarmType);
+
+        msg.setChannel(channel);
+        msg.setMsgType(CableSensorMessage.MSG_TYPE_ALARM);
+        msg.setBindingDeviceId("IM2211C_0001");
+        msg.setSensorId("123456789ABCD");
+        msg.setData(alarm);
+
+        Gson gson = new Gson();
+        String jsonStr = gson.toJson(msg);
+        return jsonStr;
+    }
 
 
 }
